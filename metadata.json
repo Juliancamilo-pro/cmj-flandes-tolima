@@ -1,0 +1,6 @@
+{
+  "name": "Consejo Municipal de Juventud Flandes",
+  "description": "Plataforma institucional del Consejo Municipal de Juventud de Flandes, Tolima. Espacio de participación democrática, gestión juvenil, transparencia y concertación.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,52 @@
+[
+  {
+    "id": "log_1793992869647_iegpd",
+    "timestamp": "2026-11-06T19:21:09.647Z",
+    "userEmail": "valentina.morales@ejemplo.com",
+    "userName": "Valentina Morales",
+    "action": "REGISTER_WITH_CODE",
+    "targetResource": "auth",
+    "details": "Consejero registrado con código cmj-flandes",
+    "ipAddress": "127.0.0.1"
+  },
+  {
+    "id": "log_1793992864865_dz1ba",
+    "timestamp": "2026-11-06T19:21:04.865Z",
+    "userEmail": "trujillogordilooo@gmail.com",
+    "userName": "Secretario Trujillo Gordillo",
+    "action": "LOGIN",
+    "targetResource": "auth",
+    "details": "Inicio de sesión exitoso en el portal institucional",
+    "ipAddress": "127.0.0.1"
+  },
+  {
+    "id": "log_1793992637072_8c43t",
+    "timestamp": "2026-11-06T19:17:17.072Z",
+    "userEmail": "trujillogordilooo@gmail.com",
+    "userName": "Secretario Trujillo Gordillo",
+    "action": "LOGIN",
+    "targetResource": "auth",
+    "details": "Inicio de sesión exitoso en el portal institucional",
+    "ipAddress": "127.0.0.1"
+  },
+  {
+    "id": "log_1793991873554_raqay",
+    "timestamp": "2026-11-06T19:04:33.554Z",
+    "userEmail": "admin@cmj-flandes.gov.co",
+    "userName": "Administrador del Sistema CMJ",
+    "action": "CREATE_USER",
+    "targetResource": "users",
+    "details": "Creó usuario: Julian Camilo Trujillo Gordillo (trujillogordilooo@gmail.com) con rol admin",
+    "ipAddress": "127.0.0.1"
+  },
+  {
+    "id": "log_1793991813402_7mub4",
+    "timestamp": "2026-11-06T19:03:33.402Z",
+    "userEmail": "admin@cmj-flandes.gov.co",
+    "userName": "Administrador del Sistema CMJ",
+    "action": "LOGIN",
+    "targetResource": "auth",
+    "details": "Inicio de sesión exitoso en el portal institucional",
+    "ipAddress": "127.0.0.1"
+  }
+]

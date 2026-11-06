@@ -1,0 +1,143 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Lora', Georgia, Cambria, serif;
+  --font-display: 'Cinzel', 'Lora', serif;
+
+  /* Tolima & Flandes Palettes: Vinotinto (garnet/maroon), Oro (warm gold), Magdalena River Blue, Verde Valle */
+  --color-vinotinto-900: #4a0404;
+  --color-vinotinto-800: #6b0c0c;
+  --color-vinotinto-700: #881313;
+  --color-vinotinto-600: #a31d1d;
+  --color-vinotinto-500: #b91c1c;
+
+  --color-oro-600: #b45309;
+  --color-oro-500: #d97706;
+  --color-oro-400: #f59e0b;
+  --color-oro-300: #fbbf24;
+  --color-oro-100: #fef3c7;
+}
+
+:root {
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
+  --font-serif: 'Lora', serif;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+/* Accessibility: Font Scaling */
+html.font-large {
+  font-size: 112%;
+}
+
+html.font-xlarge {
+  font-size: 125%;
+}
+
+html.font-xxlarge {
+  font-size: 140%;
+}
+
+/* Accessibility: High Contrast Modes */
+html.contrast-dark-yellow,
+html.contrast-dark-yellow body {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+}
+
+html.contrast-dark-yellow * {
+  border-color: #ffff00 !important;
+}
+
+html.contrast-dark-yellow a,
+html.contrast-dark-yellow button {
+  color: #00ffff !important;
+  text-decoration: underline !important;
+}
+
+html.contrast-light-black,
+html.contrast-light-black body {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+html.contrast-light-black * {
+  border-color: #000000 !important;
+}
+
+html.contrast-grayscale {
+  filter: grayscale(100%) !important;
+}
+
+/* Accessibility: Dyslexia-friendly typography */
+html.dyslexic-font body,
+html.dyslexic-font * {
+  font-family: 'Comic Sans MS', 'Trebuchet MS', sans-serif !important;
+  letter-spacing: 0.06em !important;
+  line-height: 1.8 !important;
+  word-spacing: 0.15em !important;
+}
+
+/* Accessibility: Big Cursor */
+html.big-cursor,
+html.big-cursor * {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath fill='%23000' stroke='%23FFF' stroke-width='2' d='M2 2l12 28 4-12 12-4L2 2z'/%3E%3C/svg%3E"), auto !important;
+}
+
+/* Accessibility: Stop Animations */
+html.stop-animations *,
+html.stop-animations *::before,
+html.stop-animations *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+
+/* Accessibility: Highlight interactive links & focus */
+html.highlight-links a,
+html.highlight-links button:not(.no-highlight) {
+  text-decoration: underline 2px solid #b45309 !important;
+  outline: 2px dashed #b45309 !important;
+  outline-offset: 2px !important;
+}
+
+/* Focus Visible for Keyboard Navigation (WCAG 2.1 AA) */
+*:focus-visible {
+  outline: 3px solid #b91c1c !important;
+  outline-offset: 3px !important;
+}
+
+/* Skip to Content Link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #881313;
+  color: white;
+  padding: 8px 16px;
+  z-index: 100;
+  transition: top 0.2s;
+  font-weight: bold;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Print styling for official acts and reports */
+@media print {
+  header, footer, nav, .no-print, .accessibility-bar {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+}

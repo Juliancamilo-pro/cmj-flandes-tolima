@@ -1,0 +1,183 @@
+{
+  "users": [
+    {
+      "id": "usr_trujillo_admin",
+      "name": "Secretario Trujillo Gordillo",
+      "email": "trujillogordilooo@gmail.com",
+      "passwordHash": "$2b$10$RvT2oIP1YfEWnH9Gv.fcHufY.1n.zpV.l0d1si5Aer92t3MFHjN7q",
+      "role": "admin",
+      "status": "active",
+      "isSuperAdmin": true,
+      "sector": "Mesa Directiva",
+      "createdAt": "2026-01-01T00:00:00Z"
+    }
+  ],
+  "consejeros": [
+    {
+      "id": "cons_trujillo_01",
+      "name": "Trujillo Gordillo",
+      "roleTitle": "Secretario General del CMJ",
+      "isMesaDirectiva": true,
+      "mesaDirectivaPosition": "Secretario General",
+      "representationSector": "Mesa Directiva y Coordinación General",
+      "partyOrOrgName": "Consejo Municipal de Juventud de Flandes",
+      "commissionId": "com_01",
+      "commissionName": "Mesa Directiva y Gestión Documental",
+      "bio": "Secretario General del Consejo Municipal de Juventud de Flandes (Tolima). Administrador de la plataforma institucional, encargado de la custodia y publicación de actas, convocatorias, archivo público y vinculación de consejeros.",
+      "functions": [
+        "Elaborar, custodiar y publicar las actas oficiales de sesiones plenarias.",
+        "Gestionar las convocatorias institucionales y el calendario de trabajo del CMJ.",
+        "Administrar la plataforma web y la acreditación de consejeros juveniles.",
+        "Canalizar la correspondencia oficial y las propuestas de la juventud de Flandes."
+      ],
+      "initiatives": [],
+      "projects": [],
+      "photoUrl": "",
+      "contactEmail": "trujillogordilooo@gmail.com",
+      "period": "2024 - 2026",
+      "status": "Activo",
+      "order": 1
+    }
+  ],
+  "commissions": [
+    {
+      "id": "com_01",
+      "name": "Comisión de Educación, Ciencia, Tecnología y Cultura",
+      "slug": "educacion-cultura",
+      "icon": "BookOpen",
+      "color": "amber",
+      "description": "Comisión encargada del seguimiento al acceso a educación superior, becas, conectividad digital, arte, patrimonio cultural y juventudes creativas de Flandes.",
+      "objectives": [
+        "Articular convenios educativos para subsidios y transporte estudiantil Flandes - Girardot - Ibagué.",
+        "Fomentar las expresiones artísticas, música, danza y rescate cultural ribereño.",
+        "Promover aulas digitales y conectividad en veredas y barrios vulnerables."
+      ],
+      "coordinador": "Por designar en plenaria",
+      "secretary": "Por designar en plenaria",
+      "membersCount": 0,
+      "activeProjectsCount": 0
+    },
+    {
+      "id": "com_02",
+      "name": "Comisión de Medio Ambiente, Desarrollo Rural y Cuenca del Río Magdalena",
+      "slug": "ambiente-rural",
+      "icon": "Leaf",
+      "color": "emerald",
+      "description": "Comisión encargada de la defensa de los ecosistemas del Río Magdalena, gestión del agua, reciclaje comunitario y fortalecimiento de las veredas de Flandes.",
+      "objectives": [
+        "Veeduría al cuidado hídrico y ambiental de la ribera del Río Magdalena.",
+        "Apoyo a proyectos productivos de jóvenes campesinos en veredas flamencas.",
+        "Campañas de arborización y educación ambiental escolar."
+      ],
+      "coordinador": "Por designar en plenaria",
+      "secretary": "Por designar en plenaria",
+      "membersCount": 0,
+      "activeProjectsCount": 0
+    },
+    {
+      "id": "com_03",
+      "name": "Comisión de Salud Integral, Deporte y Recreación",
+      "slug": "salud-deporte",
+      "icon": "HeartPulse",
+      "color": "rose",
+      "description": "Comisión dedicada a la salud mental juvenil, prevención de adicciones, salud sexual y reproductiva, y fomento de escuelas deportivas.",
+      "objectives": [
+        "Impulsar la política de salud mental y líneas de atención psicológica gratuita para jóvenes.",
+        "Recuperación y mantenimiento de polideportivos y parques en Flandes.",
+        "Torneos intercolegiados y festivales de deportes alternativos."
+      ],
+      "coordinador": "Por designar en plenaria",
+      "secretary": "Por designar en plenaria",
+      "membersCount": 0,
+      "activeProjectsCount": 0
+    },
+    {
+      "id": "com_04",
+      "name": "Comisión de Emprendimiento, Empleo y Desarrollo Económico",
+      "slug": "emprendimiento-empleo",
+      "icon": "Briefcase",
+      "color": "blue",
+      "description": "Comisión para la generación de oportunidades económicas, formación técnica con el SENA y apoyo a emprendedores jóvenes flamencos.",
+      "objectives": [
+        "Ferias municipales de emprendimiento e innovación juvenil.",
+        "Alianzas institucionales para el primer empleo juvenil en la región.",
+        "Capacitación en marketing digital, finanzas personales y comercio electrónico."
+      ],
+      "coordinador": "Por designar en plenaria",
+      "secretary": "Por designar en plenaria",
+      "membersCount": 0,
+      "activeProjectsCount": 0
+    },
+    {
+      "id": "com_05",
+      "name": "Comisión de Derechos Humanos, Paz y Participación Ciudadana",
+      "slug": "derechos-paz",
+      "icon": "ShieldCheck",
+      "color": "red",
+      "description": "Comisión rectora de la veeduría juvenil, garantías democráticas, no estigmatización y articulación con víctimas del conflicto.",
+      "objectives": [
+        "Garantizar el ejercicio libre del liderazgo juvenil y la participación ciudadana.",
+        "Mesas de diálogo social y resolución pacífica de conflictos barriales.",
+        "Veeduría al cumplimiento del Estatuto de Ciudadanía Juvenil (Ley 1622/1885).",
+      ],
+      "coordinador": "Por designar en plenaria",
+      "secretary": "Por designar en plenaria",
+      "membersCount": 0,
+      "activeProjectsCount": 0
+    }
+  ],
+  "news": [],
+  "documents": [],
+  "sessions": [],
+  "projects": [],
+  "activities": [],
+  "citizenProposals": [],
+  "polls": [],
+  "commitments": [],
+  "internalVotes": [],
+  "socialOversight": [],
+  "trainingResources": [
+    {
+      "id": "train_01",
+      "title": "Ley Estatutaria de Ciudadanía Juvenil (Leyes 1622 de 2013 y 1885 de 2018)",
+      "category": "Marco Normativo",
+      "description": "Estatuto normativo que reglamenta el funcionamiento, competencias y deberes de los Consejos Municipales de Juventud en Colombia.",
+      "format": "PDF Oficial",
+      "url": "https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=53066"
+    },
+    {
+      "id": "train_02",
+      "title": "Guía para la Concertación de la Agenda Municipal de Juventud",
+      "category": "Gestión Pública",
+      "description": "Manual metodológico de Colombia Joven para la formulación participativa de políticas públicas de juventud a nivel territorial.",
+      "format": "Guía Técnica",
+      "url": "https://colombiajoven.gov.co"
+    }
+  ],
+  "partners": [
+    {
+      "id": "part_01",
+      "name": "Alcaldía Municipal de Flandes",
+      "role": "Entidad Territorial y Enlace Administrativo",
+      "website": "https://www.flandes-tolima.gov.co/"
+    },
+    {
+      "id": "part_02",
+      "name": "Concejo Municipal de Flandes",
+      "role": "Corporación Pública Coadministradora",
+      "website": "https://concejo-flandes-tolima.gov.co/"
+    },
+    {
+      "id": "part_03",
+      "name": "Gobernación del Tolima - Dirección de Juventud",
+      "role": "Gobierno Departamental",
+      "website": "https://www.tolima.gov.co/"
+    },
+    {
+      "id": "part_04",
+      "name": "Colombia Joven - Consejería Presidencial para la Juventud",
+      "role": "Sistema Nacional de Juventudes",
+      "website": "https://colombiajoven.gov.co"
+    }
+  ]
+}
