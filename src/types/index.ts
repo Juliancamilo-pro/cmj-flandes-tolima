@@ -24,11 +24,60 @@ export interface User {
   role: UserRole;
   status: 'active' | 'suspended';
   sector?: RepresentationSector;
+  politicalParty?: string;
   commissionId?: string;
   avatarUrl?: string;
   phone?: string;
   createdAt: string;
+  lastLogin?: string;
   isSuperAdmin?: boolean;
+}
+
+export interface MediaItem {
+  id: string;
+  name: string;
+  type: 'image' | 'video' | 'document';
+  mimeType: string;
+  size: number;
+  url: string;
+  thumbnailUrl?: string;
+  category: 'institucional' | 'eventos' | 'consejeros' | 'territorio' | 'documentos' | 'general';
+  title: string;
+  description?: string;
+  altText?: string;
+  dimensions?: { width: number; height: number };
+  duration?: number;
+  uploadedBy: string;
+  uploadedAt: string;
+  isExternal?: boolean;
+  externalPlatform?: 'youtube' | 'vimeo' | 'otro';
+  usedIn?: Array<{ module: string; referenceId: string; referenceTitle: string }>;
+}
+
+export interface SiteSettings {
+  siteName: string;
+  municipality: string;
+  department: string;
+  period: string;
+  logoUrl: string;
+  shieldUrl: string;
+  heroBannerUrl: string;
+  heroTitle: string;
+  heroSubtitle: string;
+  heroBadge: string;
+  address: string;
+  contactEmail: string;
+  contactPhone: string;
+  officeHours: string;
+  socialLinks: {
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+    youtube?: string;
+  };
+  customAnnouncements?: string;
+  updatedAt?: string;
+  updatedBy?: string;
 }
 
 export interface ConsejeroProfile {

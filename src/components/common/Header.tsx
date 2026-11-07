@@ -6,6 +6,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useSiteSettings } from '../../context/SiteSettingsContext';
 import {
   Moon,
   Sun,
@@ -29,6 +30,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, onOpenLogin }) => {
   const { user, logout } = useAuth();
+  const { settings } = useSiteSettings();
   const { isDark, toggleDarkMode, fontSize, setFontSize, setAccessibilityModalOpen } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
@@ -141,17 +143,17 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onNavigate, onOpenL
           className="text-left flex items-center gap-3 shrink-0 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-900"
         >
           <img
-            src="/src/assets/images/cmj_flandes_emblem_1793990337067.jpg"
+            src={settings.logoUrl || settings.shieldUrl || "/src/assets/images/cmj_flandes_emblem_1793990337067.jpg"}
             alt="Escudo oficial CMJ Flandes"
             className="w-10 h-10 rounded-full object-cover shadow-xs border border-amber-500/40 shrink-0"
             referrerPolicy="no-referrer"
           />
           <div className="flex flex-col">
             <span className="font-serif font-bold text-base sm:text-lg tracking-tight text-red-950 dark:text-red-100 whitespace-nowrap">
-              CMJ FLANDES
+              CMJ {settings.municipality.toUpperCase()}
             </span>
             <span className="text-[11px] text-stone-500 dark:text-stone-400 uppercase tracking-widest font-sans font-medium">
-              Tolima · Colombia
+              {settings.department} · Colombia
             </span>
           </div>
         </button>

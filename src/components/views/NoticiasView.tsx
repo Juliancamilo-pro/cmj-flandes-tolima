@@ -6,14 +6,27 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api';
 import { NewsArticle } from '../../types';
-import { Search, Calendar, User, ArrowRight, X, Share2, Tag } from 'lucide-react';
+import { Search, Calendar, User, ArrowRight, X, Share2, Tag, Trash2 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 export const NoticiasView: React.FC = () => {
+  const { user } = useAuth();
+  const isMainAdmin = user?.role === 'admin' || user?.role === 'presidente' || user?.role === 'vicepresidente' || user?.email?.toLowerCase() === 'trujillogordilooo@gmail.com';
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todas');
   const [readingArticle, setReadingArticle] = useState<NewsArticle | null>(null);
+
+  const handleDeleteArticle = async (id: string) => {
+    if (!confirm('¿Confirma que desea eliminar esta noticia / comunicado del portal?')) return;
+    try {
+      await api.deleteNews(id);
+      loadNews();
+    } catch (err: any) {
+      alert(err.message || 'Error al eliminar noticia');
+    }
+  };
 
   useEffect(() => {
     loadNews();
@@ -138,14 +151,23 @@ export const NoticiasView: React.FC = () => {
                 </div>
               </div>
 
-              <div className="p-6 pt-0">
+              <div className="p-6 pt-0 flex items-center gap-2">
                 <button
                   onClick={() => setReadingArticle(article)}
-                  className="w-full py-2 px-3 text-xs font-semibold text-red-900 dark:text-red-400 hover:text-white hover:bg-red-900 dark:hover:bg-red-800 rounded-lg transition-colors border border-red-900/30 text-center flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2 px-3 text-xs font-semibold text-red-900 dark:text-red-400 hover:text-white hover:bg-red-900 dark:hover:bg-red-800 rounded-lg transition-colors border border-red-900/30 text-center flex items-center justify-center gap-1.5"
                 >
-                  <span>Leer Comunicado Completo</span>
+                  <span>Leer Comunicado</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
+                {isMainAdmin && (
+                  <button
+                    onClick={() => handleDeleteArticle(article.id)}
+                    className="p-2 text-stone-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg transition-colors border border-stone-200 dark:border-stone-800"
+                    title="Eliminar noticia del portal"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
             </article>
           ))}

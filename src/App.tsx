@@ -6,6 +6,7 @@
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { SiteSettingsProvider } from './context/SiteSettingsContext';
 import { Header } from './components/common/Header';
 import { Footer } from './components/common/Footer';
 import { LoginModal } from './components/auth/LoginModal';
@@ -149,7 +150,9 @@ export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <AppContent />
+        <SiteSettingsProvider>
+          <AppContent />
+        </SiteSettingsProvider>
       </AuthProvider>
     </ThemeProvider>
   );

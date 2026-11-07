@@ -19,7 +19,9 @@ import {
   Edit,
   UserCheck,
   Layers,
-  Sparkles
+  Sparkles,
+  Flag,
+  Landmark
 } from 'lucide-react';
 
 interface IntegrantesViewProps {
@@ -177,9 +179,18 @@ export const IntegrantesView: React.FC<IntegrantesViewProps> = ({ onNavigateToAd
                   <p className="text-xs font-semibold text-red-900 dark:text-red-400 font-sans mt-0.5">
                     {c.roleTitle}
                   </p>
+                  {/* Partido o Movimiento Político */}
+                  <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-950 dark:text-amber-200 border border-amber-200 dark:border-amber-800">
+                    <Flag className="w-3 h-3 text-amber-700 dark:text-amber-400 shrink-0" />
+                    <span className="truncate max-w-[210px]">{c.partyOrOrgName || 'Lista Independiente / Proceso Juvenil'}</span>
+                  </div>
                 </div>
 
                 <div className="text-xs text-stone-600 dark:text-stone-400 space-y-1.5 pt-2 border-t border-stone-100 dark:border-stone-800">
+                  <div className="flex items-center gap-2">
+                    <Landmark className="w-3.5 h-3.5 text-stone-400 shrink-0" />
+                    <span className="font-medium text-stone-800 dark:text-stone-200 truncate">{c.partyOrOrgName || 'Lista Independiente'}</span>
+                  </div>
                   <div className="flex items-center gap-2">
                     <Layers className="w-3.5 h-3.5 text-stone-400 shrink-0" />
                     <span className="truncate">{c.representationSector}</span>
@@ -260,9 +271,16 @@ export const IntegrantesView: React.FC<IntegrantesViewProps> = ({ onNavigateToAd
                   <h4 className="font-serif font-bold text-xl text-stone-900 dark:text-white">
                     {selectedConsejero.name}
                   </h4>
-                  <p className="text-xs text-stone-500 dark:text-stone-400">
-                    {selectedConsejero.partyOrOrgName} · Sector: {selectedConsejero.representationSector}
-                  </p>
+                  {/* Partido Político destacado */}
+                  <div className="pt-1 flex flex-wrap items-center gap-2">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-800 shadow-xs">
+                      <Flag className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
+                      <span>Partido o Movimiento: {selectedConsejero.partyOrOrgName || 'Lista Independiente / Proceso Juvenil'}</span>
+                    </div>
+                    <span className="text-xs text-stone-500 dark:text-stone-400">
+                      Sector: {selectedConsejero.representationSector}
+                    </span>
+                  </div>
                   <div className="pt-2 text-xs text-stone-600 dark:text-stone-300 flex flex-wrap gap-4">
                     {selectedConsejero.contactEmail && (
                       <div className="flex items-center gap-1.5">

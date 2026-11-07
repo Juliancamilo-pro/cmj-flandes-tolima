@@ -5,7 +5,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api';
-import { NewsArticle, CouncilSession, PublicPoll, YouthProject, InstitutionalPartner } from '../../types';
+import { NewsArticle, CouncilSession, PublicPoll, YouthProject, InstitutionalPartner, MediaItem } from '../../types';
+import { useSiteSettings } from '../../context/SiteSettingsContext';
 import {
   Calendar,
   FileText,
@@ -19,7 +20,10 @@ import {
   CheckCircle,
   ExternalLink,
   Clock,
-  Sparkles
+  Sparkles,
+  Image as ImageIcon,
+  Video,
+  Play
 } from 'lucide-react';
 
 interface HomeViewProps {
@@ -28,10 +32,13 @@ interface HomeViewProps {
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenArticle }) => {
+  const { settings } = useSiteSettings();
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [sessions, setSessions] = useState<CouncilSession[]>([]);
   const [polls, setPolls] = useState<PublicPoll[]>([]);
   const [partners, setPartners] = useState<InstitutionalPartner[]>([]);
+  const [mediaList, setMediaList] = useState<MediaItem[]>([]);
+  const [previewMedia, setPreviewMedia] = useState<MediaItem | null>(null);
   const [selectedOptionId, setSelectedOptionId] = useState<string>('');
   const [pollVoted, setPollVoted] = useState<boolean>(false);
   const [votingLoading, setVotingLoading] = useState<boolean>(false);
@@ -47,17 +54,19 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenArticle })
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [newsData, sessionsData, pollsData, partnersData, statsData] = await Promise.all([
+        const [newsData, sessionsData, pollsData, partnersData, mediaData, statsData] = await Promise.all([
           api.getNews(),
           api.getSessions(),
           api.getPolls(),
           api.getPartners(),
+          api.getMedia().catch(() => []),
           api.getPublicStats().catch(() => null),
         ]);
         setNews(newsData);
         setSessions(sessionsData);
         setPolls(pollsData);
         setPartners(partnersData);
+        if (mediaData) setMediaList(mediaData);
         if (statsData) setStats(statsData);
       } catch (err) {
         console.error('Error loading home data:', err);
@@ -89,8 +98,8 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenArticle })
         {/* Background Image with Measured Contrast Scrim */}
         <div className="absolute inset-0 z-0">
           <img
-            src="/src/assets/images/flandes_river_landscape_1793990334929.jpg"
-            alt="Paisaje del Río Magdalena en Flandes, Tolima"
+            src={settings.heroBannerUrl || "/src/assets/images/flandes_river_landscape_1793990334929.jpg"}
+            alt={settings.heroTitle}
             className="w-full h-full object-cover object-center filter brightness-90"
             referrerPolicy="no-referrer"
           />
@@ -102,19 +111,19 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenArticle })
           <div className="max-w-2xl space-y-6">
             {/* Clean Unboxed Metadata */}
             <div className="flex items-center gap-2 text-xs text-amber-400 font-semibold tracking-wider uppercase font-sans">
-              <span>Flandes, Tolima</span>
+              <span>{settings.municipality}, {settings.department}</span>
               <span aria-hidden="true">·</span>
-              <span>Estatuto de Ciudadanía Juvenil</span>
+              <span>{settings.heroBadge || 'Estatuto de Ciudadanía Juvenil'}</span>
               <span aria-hidden="true">·</span>
-              <span>Periodo 2024 - 2026</span>
+              <span>Periodo {settings.period}</span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-white tracking-tight leading-tight [text-wrap:balance]">
-              Consejo Municipal de Juventud de Flandes
+              {settings.heroTitle}
             </h1>
 
             <p className="text-sm sm:text-base text-stone-200 leading-relaxed font-sans font-light">
-              Espacio democrático institucional de concertación, vigilancia y control social de las juventudes flamencas ante la Alcaldía de Flandes, el Concejo Municipal y el Estado colombiano.
+              {settings.heroSubtitle}
             </p>
 
             {/* Hero CTAs */}
@@ -618,6 +627,107 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate, onOpenArticle })
           </div>
         </div>
       </section>
+
+      {/* Multimedia & Territorial Showcase */}
+      {mediaList.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+            <div>
+              <div className="text-xs uppercase tracking-widest text-red-900 dark:text-red-400 font-bold font-sans">
+                Galería Territorial y Actividades
+              </div>
+              <h3 className="font-serif font-bold text-2xl sm:text-3xl text-stone-900 dark:text-white mt-1">
+                Flandes en Imágenes y Videos Oficiales
+              </h3>
+              <p className="text-xs sm:text-sm text-stone-500 mt-1 max-w-xl">
+                Registro visual de las asambleas, sesiones, paisajes ribereños del Río Magdalena y eventos juveniles de nuestro municipio.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {mediaList.slice(0, 4).map((item) => (
+              <div
+                key={item.id}
+                onClick={() => setPreviewMedia(item)}
+                className="group relative aspect-[4/3] rounded-2xl overflow-hidden bg-stone-950 border border-stone-200 dark:border-stone-800 cursor-pointer shadow-xs hover:shadow-lg transition-all"
+              >
+                {item.type === 'image' ? (
+                  <img
+                    src={item.url}
+                    alt={item.altText || item.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="relative w-full h-full">
+                    <img
+                      src={item.thumbnailUrl || 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600'}
+                      alt={item.title}
+                      className="w-full h-full object-cover opacity-80"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-full bg-red-900/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                        <Play className="w-5 h-5 fill-current ml-0.5" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4 text-white">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
+                    {item.category}
+                  </span>
+                  <h4 className="text-xs font-bold font-serif leading-tight mt-0.5 line-clamp-2">
+                    {item.title}
+                  </h4>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Preview Modal for Home */}
+      {previewMedia && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-in fade-in">
+          <div className="relative w-full max-w-4xl max-h-[90vh] bg-white dark:bg-stone-900 rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+            <div className="px-6 py-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
+              <h4 className="text-sm font-bold font-serif text-stone-900 dark:text-white truncate">
+                {previewMedia.title}
+              </h4>
+              <button
+                onClick={() => setPreviewMedia(null)}
+                className="text-stone-400 hover:text-stone-700 dark:hover:text-stone-200 text-lg font-bold"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="p-4 bg-black flex items-center justify-center max-h-[480px] overflow-hidden">
+              {previewMedia.type === 'image' ? (
+                <img
+                  src={previewMedia.url}
+                  alt={previewMedia.altText || previewMedia.title}
+                  className="max-h-[480px] w-auto object-contain"
+                />
+              ) : previewMedia.isExternal ? (
+                <iframe
+                  src={previewMedia.url}
+                  title={previewMedia.title}
+                  className="w-full aspect-video"
+                  allowFullScreen
+                />
+              ) : (
+                <video src={previewMedia.url} controls className="max-h-[480px] w-full" />
+              )}
+            </div>
+            {previewMedia.description && (
+              <div className="p-4 text-xs text-stone-600 dark:text-stone-300 bg-stone-50 dark:bg-stone-800/50">
+                <p>{previewMedia.description}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Institutional Allies Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6">

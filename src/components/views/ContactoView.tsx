@@ -7,8 +7,10 @@ import React, { useState } from 'react';
 import { MapPin, Mail, Phone, Clock, Send, CheckCircle2, ExternalLink } from 'lucide-react';
 import { FlandesTerritorialMap } from '../maps/FlandesTerritorialMap';
 import { api } from '../../services/api';
+import { useSiteSettings } from '../../context/SiteSettingsContext';
 
 export const ContactoView: React.FC = () => {
+  const { settings } = useSiteSettings();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -73,9 +75,9 @@ export const ContactoView: React.FC = () => {
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-red-900 dark:text-red-400 shrink-0 mt-0.5" />
                 <div>
-                  <strong className="block text-stone-900 dark:text-white">Palacio Municipal de Flandes</strong>
-                  <span>Carrera 8 con Calle 9, Frente al Parque Principal</span>
-                  <span className="block text-stone-400 text-xs">Flandes, Tolima, Colombia</span>
+                  <strong className="block text-stone-900 dark:text-white">Sede Institucional CMJ</strong>
+                  <span>{settings.address}</span>
+                  <span className="block text-stone-400 text-xs">{settings.municipality}, {settings.department}, Colombia</span>
                 </div>
               </div>
 
@@ -84,10 +86,10 @@ export const ContactoView: React.FC = () => {
                 <div>
                   <strong className="block text-stone-900 dark:text-white">Correo Oficial de la Secretaría</strong>
                   <a
-                    href="mailto:trujillogordilooo@gmail.com"
+                    href={`mailto:${settings.contactEmail}`}
                     className="font-medium text-red-900 dark:text-red-400 hover:underline break-all"
                   >
-                    trujillogordilooo@gmail.com
+                    {settings.contactEmail}
                   </a>
                   <span className="block text-[11px] text-stone-500">Atención oficial Mesa Directiva</span>
                 </div>
@@ -97,7 +99,7 @@ export const ContactoView: React.FC = () => {
                 <Phone className="w-5 h-5 text-amber-600 shrink-0" />
                 <div>
                   <strong className="block text-stone-900 dark:text-white">Línea de Juventudes</strong>
-                  <span>+57 (8) 248 0000 / Ext. Juventudes</span>
+                  <span>{settings.contactPhone}</span>
                 </div>
               </div>
 
@@ -105,7 +107,7 @@ export const ContactoView: React.FC = () => {
                 <Clock className="w-5 h-5 text-stone-400 shrink-0 mt-0.5" />
                 <div>
                   <strong className="block text-stone-900 dark:text-white">Horario de Atención al Ciudadano</strong>
-                  <span>Lunes a Viernes: 8:00 AM - 12:00 PM y 2:00 PM - 5:00 PM</span>
+                  <span>{settings.officeHours}</span>
                 </div>
               </div>
             </div>

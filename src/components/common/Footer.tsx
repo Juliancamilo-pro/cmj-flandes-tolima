@@ -5,12 +5,15 @@
 
 import React from 'react';
 import { MapPin, Mail, Phone, Clock, ShieldCheck, Scale, ExternalLink } from 'lucide-react';
+import { useSiteSettings } from '../../context/SiteSettingsContext';
 
 interface FooterProps {
   onNavigate: (view: string) => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+  const { settings } = useSiteSettings();
+
   return (
     <footer className="bg-stone-900 text-stone-300 dark:bg-stone-950 dark:text-stone-400 border-t border-stone-800 transition-colors">
       {/* Top Banner with Regional Flag Accent */}
@@ -22,20 +25,20 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <img
-                src="/src/assets/images/cmj_flandes_emblem_1793990337067.jpg"
+                src={settings.logoUrl || settings.shieldUrl || "/src/assets/images/cmj_flandes_emblem_1793990337067.jpg"}
                 alt="Escudo CMJ Flandes"
                 className="w-12 h-12 rounded-full object-cover border border-amber-500/50"
                 referrerPolicy="no-referrer"
               />
               <div>
-                <h3 className="font-serif font-bold text-white text-base tracking-tight leading-tight">
-                  CONSEJO MUNICIPAL DE JUVENTUD
+                <h3 className="font-serif font-bold text-white text-base tracking-tight leading-tight uppercase">
+                  {settings.siteName}
                 </h3>
-                <p className="text-xs text-amber-400 font-medium">Flandes · Tolima · Colombia</p>
+                <p className="text-xs text-amber-400 font-medium">{settings.municipality} · {settings.department} · Colombia</p>
               </div>
             </div>
             <p className="text-xs text-stone-400 leading-relaxed">
-              Órgano colegiado de concertación, vigilancia, control social y participación democrática de las juventudes de Flandes ante la administración municipal y el Estado colombiano.
+              Órgano colegiado de concertación, vigilancia, control social y participación democrática de las juventudes de {settings.municipality} ante la administración municipal y el Estado colombiano.
             </p>
             <div className="pt-2 text-xs text-stone-400 space-y-1.5">
               <div className="flex items-center gap-2">
@@ -158,21 +161,20 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             <div className="space-y-2.5 text-xs text-stone-400">
               <div className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
-                <span>Palacio Municipal de Flandes / Recinto del Concejo, Carrera 8 con Calle 9, Flandes, Tolima.</span>
+                <span>{settings.address}</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-amber-500 shrink-0" />
-                <span>contacto@cmj-flandes.gov.co</span>
+                <a href={`mailto:${settings.contactEmail}`} className="hover:text-white transition-colors">{settings.contactEmail}</a>
               </div>
               <div className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-amber-500 shrink-0" />
-                <span>+57 (8) 248 0000 / Línea Juvenil</span>
+                <span>{settings.contactPhone}</span>
               </div>
               <div className="flex items-start gap-2.5">
                 <Clock className="w-4 h-4 text-stone-400 shrink-0 mt-0.5" />
                 <div>
-                  <p>Lunes a Viernes:</p>
-                  <p className="text-stone-300">8:00 AM - 12:00 PM · 2:00 PM - 5:00 PM</p>
+                  <p className="text-stone-300">{settings.officeHours}</p>
                 </div>
               </div>
             </div>

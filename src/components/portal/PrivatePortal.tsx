@@ -46,8 +46,17 @@ import {
   Printer,
   ChevronRight,
   Shield,
-  Send
+  Send,
+  Image as ImageIcon,
+  Sparkles,
+  Flag,
+  Landmark,
+  Power,
+  RotateCcw
 } from 'lucide-react';
+import { MediaLibraryModule } from './MediaLibraryModule';
+import { SiteSettingsModule } from './SiteSettingsModule';
+import { MediaUploaderModal } from '../common/MediaUploaderModal';
 
 interface PrivatePortalProps {
   onBackToPublic: () => void;
@@ -56,6 +65,9 @@ interface PrivatePortalProps {
 export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) => {
   const { user, logout, hasRole } = useAuth();
   const [activeModule, setActiveModule] = useState<string>('dashboard');
+
+  // Three Main Administrators with Full Power (Admin, Presidente, Vicepresidente)
+  const isMainAdmin = user?.role === 'admin' || user?.role === 'presidente' || user?.role === 'vicepresidente' || user?.isSuperAdmin || user?.email?.toLowerCase() === 'trujillogordilooo@gmail.com';
 
   // Data states
   const [sessions, setSessions] = useState<CouncilSession[]>([]);
@@ -80,6 +92,7 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
   const [selectedProposalToRespond, setSelectedProposalToRespond] = useState<CitizenProposal | null>(null);
   const [officialResponseText, setOfficialResponseText] = useState('');
   const [officialResponseStatus, setOfficialResponseStatus] = useState('Respondido');
+  const [isConsejeroPhotoOpen, setIsConsejeroPhotoOpen] = useState(false);
 
   // New item form buffers
   const [newSessionData, setNewSessionData] = useState({
@@ -108,6 +121,7 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
     password: '',
     role: 'consejero',
     sector: 'Listas Independientes',
+    politicalParty: '',
     phone: '',
   });
 
@@ -149,7 +163,7 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
       setDocuments(docs);
       setTraining(train);
 
-      if (user?.role === 'admin') {
+      if (isMainAdmin) {
         const [usersData, logsData] = await Promise.all([
           api.getAdminUsers(),
           api.getAuditLogs(),
@@ -159,6 +173,66 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
       }
     } catch (err) {
       console.error('Error loading private portal data:', err);
+    }
+  };
+
+  const handleToggleUserStatus = async (userItem: User) => {
+    const nextStatus = userItem.status === 'active' ? 'suspended' : 'active';
+    try {
+      await api.updateAdminUser(userItem.id, { status: nextStatus });
+      loadAllData();
+    } catch (err: any) {
+      alert(err.message || 'Error al cambiar estado del usuario');
+    }
+  };
+
+  const handleDeleteSession = async (id: string) => {
+    if (!confirm('¿Confirma que desea eliminar esta convocatoria de sesión plenaria?')) return;
+    try {
+      await api.deleteSession(id);
+      loadAllData();
+    } catch (err: any) {
+      alert(err.message || 'Error al eliminar sesión');
+    }
+  };
+
+  const handleDeleteDocument = async (id: string) => {
+    if (!confirm('¿Confirma que desea eliminar esta acta / documento oficial?')) return;
+    try {
+      await api.deleteDocument(id);
+      loadAllData();
+    } catch (err: any) {
+      alert(err.message || 'Error al eliminar documento');
+    }
+  };
+
+  const handleDeleteProject = async (id: string) => {
+    if (!confirm('¿Confirma que desea eliminar esta iniciativa / proyecto juvenil?')) return;
+    try {
+      await api.deleteProject(id);
+      loadAllData();
+    } catch (err: any) {
+      alert(err.message || 'Error al eliminar proyecto');
+    }
+  };
+
+  const handleDeleteProposal = async (id: string) => {
+    if (!confirm('¿Confirma que desea eliminar esta propuesta ciudadana radicada?')) return;
+    try {
+      await api.deleteCitizenProposal(id);
+      loadAllData();
+    } catch (err: any) {
+      alert(err.message || 'Error al eliminar propuesta');
+    }
+  };
+
+  const handleDeleteCommitment = async (id: string) => {
+    if (!confirm('¿Confirma que desea eliminar este compromiso institucional?')) return;
+    try {
+      await api.deleteCommitment(id);
+      loadAllData();
+    } catch (err: any) {
+      alert(err.message || 'Error al eliminar compromiso');
     }
   };
 
@@ -241,7 +315,7 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
     try {
       await api.createAdminUser(newUserData);
       setIsNewUserOpen(false);
-      setNewUserData({ name: '', email: '', password: '', role: 'consejero', sector: 'Listas Independientes', phone: '' });
+      setNewUserData({ name: '', email: '', password: '', role: 'consejero', sector: 'Listas Independientes', politicalParty: '', phone: '' });
       loadAllData();
     } catch (err: any) {
       alert(err.message);
@@ -299,12 +373,14 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
     { id: 'veeduria', label: '12. Veeduría y Control Social', icon: ShieldAlert },
     { id: 'formacion', label: '13. Recursos Formativos', icon: GraduationCap },
     { id: 'informes', label: '14. Generador de Informes', icon: FileSpreadsheet },
-    ...(user?.role === 'admin'
+    ...(isMainAdmin
       ? [
+          { id: 'admin-multimedia', label: 'Adm: Biblioteca Multimedia', icon: ImageIcon },
+          { id: 'admin-configuracion', label: 'Adm: Logos, Banner y Contacto', icon: Sparkles },
           { id: 'admin-usuarios', label: 'Adm: Cuentas y Permisos', icon: Settings },
           { id: 'admin-consejeros', label: 'Adm: Perfiles Consejeros', icon: Users },
           { id: 'admin-buzon', label: 'Adm: Buzón Ciudadano', icon: Send },
-          { id: 'admin-auditoria', label: 'Adm: Auditoría y Copias', icon: Shield },
+          { id: 'admin-auditoria', label: 'Adm: Auditoría y Respaldo', icon: Shield },
         ]
       : []),
   ];
@@ -518,9 +594,20 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
                       <span className="text-xs font-mono font-bold text-red-900 dark:text-red-400">
                         {ses.sessionNumber} ({ses.type})
                       </span>
-                      <span className="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-stone-200 dark:bg-stone-700">
-                        {ses.status}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs px-2.5 py-0.5 rounded-full font-semibold bg-stone-200 dark:bg-stone-700">
+                          {ses.status}
+                        </span>
+                        {isMainAdmin && (
+                          <button
+                            onClick={() => handleDeleteSession(ses.id)}
+                            className="p-1 text-stone-400 hover:text-red-600 dark:hover:text-red-400 rounded transition-colors"
+                            title="Eliminar convocatoria de sesión"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     <h4 className="font-serif font-bold text-base text-stone-900 dark:text-white">
@@ -579,10 +666,19 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
                       <p className="text-stone-500 mt-1 line-clamp-1">{doc.description}</p>
                     </div>
 
-                    <div className="text-right shrink-0">
-                      <span className="inline-block px-2.5 py-0.5 rounded font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 mb-2">
+                    <div className="text-right shrink-0 flex items-center gap-2">
+                      <span className="inline-block px-2.5 py-0.5 rounded font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950">
                         {doc.status}
                       </span>
+                      {isMainAdmin && (
+                        <button
+                          onClick={() => handleDeleteDocument(doc.id)}
+                          className="p-1 text-stone-400 hover:text-red-600 dark:hover:text-red-400 rounded transition-colors"
+                          title="Eliminar acta / documento"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -637,6 +733,15 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
                           <option value="Cumplido">Cumplido</option>
                           <option value="Atrasado">Atrasado</option>
                         </select>
+                        {isMainAdmin && (
+                          <button
+                            onClick={() => handleDeleteCommitment(tsk.id)}
+                            className="p-1 text-stone-400 hover:text-red-600 dark:hover:text-red-400 rounded transition-colors"
+                            title="Eliminar compromiso"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
                       </div>
                     </div>
 
@@ -687,9 +792,20 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
                           {proj.title}
                         </h4>
                       </div>
-                      <span className="text-xs px-2.5 py-0.5 rounded-full bg-stone-200 dark:bg-stone-700 font-semibold">
-                        {proj.status}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs px-2.5 py-0.5 rounded-full bg-stone-200 dark:bg-stone-700 font-semibold">
+                          {proj.status}
+                        </span>
+                        {isMainAdmin && (
+                          <button
+                            onClick={() => handleDeleteProject(proj.id)}
+                            className="p-1 text-stone-400 hover:text-red-600 dark:hover:text-red-400 rounded transition-colors"
+                            title="Eliminar proyecto"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">
@@ -1149,22 +1265,40 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
           )}
 
           {/* ==================================================== */}
+          {/* ADMIN: MULTIMEDIA LIBRARY (PHOTOS & VIDEOS) */}
+          {/* ==================================================== */}
+          {activeModule === 'admin-multimedia' && isMainAdmin && (
+            <div className="animate-in fade-in">
+              <MediaLibraryModule />
+            </div>
+          )}
+
+          {/* ==================================================== */}
+          {/* ADMIN: SITE SETTINGS, LOGOS & CONTACT */}
+          {/* ==================================================== */}
+          {activeModule === 'admin-configuracion' && isMainAdmin && (
+            <div className="animate-in fade-in">
+              <SiteSettingsModule />
+            </div>
+          )}
+
+          {/* ==================================================== */}
           {/* ADMIN: USER & ROLE MANAGEMENT */}
           {/* ==================================================== */}
-          {activeModule === 'admin-usuarios' && user?.role === 'admin' && (
+          {activeModule === 'admin-usuarios' && isMainAdmin && (
             <div className="p-6 bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-6 animate-in fade-in">
-              <div className="flex items-center justify-between border-b border-stone-100 dark:border-stone-800 pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-100 dark:border-stone-800 pb-4">
                 <div>
                   <h2 className="font-serif font-bold text-2xl text-stone-900 dark:text-white">
                     Administración de Cuentas Autorizadas
                   </h2>
                   <p className="text-xs text-stone-500">
-                    Control técnico de usuarios, roles institucionales y contraseñas.
+                    Control técnico de usuarios, asignación de roles directivos, partidos políticos y contraseñas.
                   </p>
                 </div>
                 <button
                   onClick={() => setIsNewUserOpen(true)}
-                  className="px-4 py-2 text-xs font-semibold text-white bg-red-900 hover:bg-red-950 rounded-lg transition-colors flex items-center gap-1.5"
+                  className="px-4 py-2 text-xs font-semibold text-white bg-red-900 hover:bg-red-950 rounded-lg transition-colors flex items-center gap-1.5 shrink-0"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Crear Nuevo Usuario</span>
@@ -1178,6 +1312,7 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
                       <th className="p-3">Nombre</th>
                       <th className="p-3">Correo Institucional</th>
                       <th className="p-3">Rol</th>
+                      <th className="p-3">Partido / Movimiento</th>
                       <th className="p-3">Estado</th>
                       <th className="p-3 text-right">Acciones</th>
                     </tr>
@@ -1187,29 +1322,52 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
                       <tr key={u.id}>
                         <td className="p-3 font-semibold text-stone-900 dark:text-white">
                           {u.name}
-                          {u.isSuperAdmin && (
+                          {(u.isSuperAdmin || u.email.toLowerCase() === 'trujillogordilooo@gmail.com') && (
                             <span className="ml-2 text-[9px] bg-red-100 text-red-900 dark:bg-red-950 dark:text-red-300 px-1.5 py-0.5 rounded font-bold">
                               SuperAdmin Protegido
                             </span>
                           )}
                         </td>
                         <td className="p-3 text-stone-500 font-mono">{u.email}</td>
-                        <td className="p-3 uppercase font-semibold text-amber-800 dark:text-amber-400">{u.role}</td>
+                        <td className="p-3 uppercase font-semibold text-amber-800 dark:text-amber-400">
+                          {u.role}
+                        </td>
+                        <td className="p-3 text-stone-600 dark:text-stone-300">
+                          <span className="inline-flex items-center gap-1 font-medium">
+                            <Flag className="w-3 h-3 text-red-700 dark:text-red-400" />
+                            <span>{u.politicalParty || u.sector || 'Lista Independiente'}</span>
+                          </span>
+                        </td>
                         <td className="p-3">
                           <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${u.status === 'active' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-red-100 text-red-800'}`}>
-                            {u.status}
+                            {u.status === 'active' ? 'Activo' : 'Suspendido'}
                           </span>
                         </td>
                         <td className="p-3 text-right">
-                          {!u.isSuperAdmin && (
-                            <button
-                              onClick={() => handleDeleteUser(u.id)}
-                              className="p-1 text-red-600 hover:text-red-800 rounded transition-colors"
-                              title="Eliminar usuario"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
+                          <div className="flex items-center justify-end gap-1">
+                            {!(u.isSuperAdmin || u.email.toLowerCase() === 'trujillogordilooo@gmail.com') && (
+                              <>
+                                <button
+                                  onClick={() => handleToggleUserStatus(u)}
+                                  className={`p-1 rounded transition-colors ${
+                                    u.status === 'active'
+                                      ? 'text-amber-600 hover:text-amber-800'
+                                      : 'text-emerald-600 hover:text-emerald-800'
+                                  }`}
+                                  title={u.status === 'active' ? 'Suspender acceso' : 'Reactivar acceso'}
+                                >
+                                  <Power className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteUser(u.id)}
+                                  className="p-1 text-red-600 hover:text-red-800 rounded transition-colors"
+                                  title="Eliminar usuario permanentemente"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1222,7 +1380,7 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
           {/* ==================================================== */}
           {/* ADMIN: CONSEJEROS PROFILE CRUD */}
           {/* ==================================================== */}
-          {activeModule === 'admin-consejeros' && user?.role === 'admin' && (
+          {activeModule === 'admin-consejeros' && isMainAdmin && (
             <div className="p-6 bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-6 animate-in fade-in">
               <div className="flex items-center justify-between border-b border-stone-100 dark:border-stone-800 pb-4">
                 <div>
@@ -1230,7 +1388,7 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
                     Administración de Perfiles de Consejeros
                   </h2>
                   <p className="text-xs text-stone-500">
-                    Actualiza con nombres reales, fotos, biografías y funciones reglamentarias.
+                    Actualiza con nombres reales, fotos, partidos políticos, biografías y funciones reglamentarias.
                   </p>
                 </div>
               </div>
@@ -1270,7 +1428,7 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
           {/* ==================================================== */}
           {/* ADMIN: BUZÓN CIUDADANO (MODERATION & RESPONSES) */}
           {/* ==================================================== */}
-          {activeModule === 'admin-buzon' && (user?.role === 'admin' || user?.role === 'secretario' || user?.role === 'presidente') && (
+          {activeModule === 'admin-buzon' && (isMainAdmin || user?.role === 'secretario') && (
             <div className="p-6 bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-6 animate-in fade-in">
               <div className="border-b border-stone-100 dark:border-stone-800 pb-4">
                 <h2 className="font-serif font-bold text-2xl text-stone-900 dark:text-white">
@@ -1291,9 +1449,20 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
                       <span className="font-mono font-bold text-red-900 dark:text-red-400">
                         {prop.radicadoCode} · {prop.topic}
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-full font-semibold bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300">
-                        {prop.status}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-0.5 rounded-full font-semibold bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300">
+                          {prop.status}
+                        </span>
+                        {isMainAdmin && (
+                          <button
+                            onClick={() => handleDeleteProposal(prop.id)}
+                            className="p-1 text-stone-400 hover:text-red-600 rounded transition-colors"
+                            title="Eliminar propuesta"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     <h4 className="font-serif font-bold text-base text-stone-900 dark:text-white">
@@ -1337,7 +1506,7 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
           {/* ==================================================== */}
           {/* ADMIN: AUDITORÍA Y COPIAS DE SEGURIDAD */}
           {/* ==================================================== */}
-          {activeModule === 'admin-auditoria' && user?.role === 'admin' && (
+          {activeModule === 'admin-auditoria' && isMainAdmin && (
             <div className="p-6 bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-800 shadow-xs space-y-6 animate-in fade-in">
               <div className="flex items-center justify-between border-b border-stone-100 dark:border-stone-800 pb-4">
                 <div>
@@ -1599,6 +1768,17 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
                   />
                 </div>
               </div>
+
+              <div>
+                <label className="font-semibold block mb-1">Partido, Movimiento o Lista de Jóvenes</label>
+                <input
+                  type="text"
+                  placeholder="Ej. Lista Independiente Jóvenes por Flandes, Partido Liberal..."
+                  value={newUserData.politicalParty}
+                  onChange={e => setNewUserData(d => ({ ...d, politicalParty: e.target.value }))}
+                  className="w-full p-2 rounded border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800"
+                />
+              </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
@@ -1676,14 +1856,33 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
                 />
               </div>
               <div>
-                <label className="font-semibold block mb-1">URL de Fotografía Oficial</label>
-                <input
-                  type="text"
-                  placeholder="/src/assets/images/... o URL"
-                  value={selectedConsejeroToEdit.photoUrl}
-                  onChange={e => setSelectedConsejeroToEdit(c => c ? { ...c, photoUrl: e.target.value } : null)}
-                  className="w-full p-2 rounded border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800"
-                />
+                <label className="font-semibold block mb-1">Fotografía Oficial del Consejero</label>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-lg bg-stone-100 dark:bg-stone-800 border border-stone-300 dark:border-stone-700 overflow-hidden shrink-0 flex items-center justify-center">
+                    {selectedConsejeroToEdit.photoUrl ? (
+                      <img src={selectedConsejeroToEdit.photoUrl} alt="Foto" className="w-full h-full object-cover" />
+                    ) : (
+                      <ImageIcon className="w-5 h-5 text-stone-400" />
+                    )}
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <input
+                      type="text"
+                      placeholder="URL o ruta de la fotografía"
+                      value={selectedConsejeroToEdit.photoUrl}
+                      onChange={e => setSelectedConsejeroToEdit(c => c ? { ...c, photoUrl: e.target.value } : null)}
+                      className="w-full p-2 rounded border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-800 text-xs"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setIsConsejeroPhotoOpen(true)}
+                      className="px-2.5 py-1 text-[11px] font-semibold bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 rounded text-stone-700 dark:text-stone-300 flex items-center gap-1"
+                    >
+                      <Upload className="w-3 h-3" />
+                      <span>Subir / Recortar Fotografía</span>
+                    </button>
+                  </div>
+                </div>
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
@@ -1704,6 +1903,17 @@ export const PrivatePortal: React.FC<PrivatePortalProps> = ({ onBackToPublic }) 
           </div>
         </div>
       )}
+
+      {/* Consejero Photo Uploader Modal */}
+      <MediaUploaderModal
+        isOpen={isConsejeroPhotoOpen}
+        onClose={() => setIsConsejeroPhotoOpen(false)}
+        onUploaded={(media) => {
+          setSelectedConsejeroToEdit(c => c ? { ...c, photoUrl: media.url } : null);
+          setIsConsejeroPhotoOpen(false);
+        }}
+        defaultCategory="consejeros"
+      />
 
       {/* Modal: Redactar Respuesta a Propuesta Ciudadana */}
       {selectedProposalToRespond && (

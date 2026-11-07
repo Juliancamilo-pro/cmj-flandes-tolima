@@ -37,68 +37,71 @@ if (!fs.existsSync(DATA_DIR)) {
 }
 
 // System Roles and Granular Pre-configured Permissions
+// System Roles and Granular Pre-configured Permissions
+const FULL_ADMIN_PERMISSIONS = [
+  'create_accounts',
+  'manage_all_users',
+  'delete_users',
+  'manage_consejeros',
+  'edit_all_consejeros',
+  'delete_consejeros',
+  'manage_sessions',
+  'create_sessions',
+  'delete_sessions',
+  'call_sessions',
+  'sync_calendar',
+  'manage_documents',
+  'upload_documents',
+  'delete_documents',
+  'approve_documents',
+  'sign_acts',
+  'publish_acts',
+  'manage_news',
+  'create_news',
+  'delete_news',
+  'manage_projects',
+  'approve_projects',
+  'delete_projects',
+  'manage_polls',
+  'create_polls',
+  'close_polls',
+  'delete_polls',
+  'manage_proposals',
+  'respond_proposals',
+  'delete_proposals',
+  'manage_media',
+  'upload_media',
+  'delete_media',
+  'manage_settings',
+  'send_official_email',
+  'view_audit_logs',
+  'download_backup',
+  'restore_backup',
+];
+
 export const SYSTEM_ROLE_PERMISSIONS: Record<string, string[]> = {
-  admin: [
-    'create_accounts',
-    'manage_all_users',
-    'delete_users',
-    'manage_consejeros',
-    'edit_all_consejeros',
+  admin: [...FULL_ADMIN_PERMISSIONS],
+  presidente: [...FULL_ADMIN_PERMISSIONS],
+  vicepresidente: [...FULL_ADMIN_PERMISSIONS],
+  secretario: [
     'manage_sessions',
     'create_sessions',
     'delete_sessions',
     'sync_calendar',
     'manage_documents',
     'upload_documents',
-    'delete_documents',
-    'manage_news',
-    'create_news',
-    'delete_news',
-    'manage_projects',
-    'approve_projects',
-    'manage_polls',
-    'create_polls',
-    'close_polls',
-    'manage_proposals',
-    'respond_proposals',
-    'send_official_email',
-    'view_audit_logs',
-    'download_backup',
-    'restore_backup',
-  ],
-  secretario: [
-    'manage_sessions',
-    'create_sessions',
-    'sync_calendar',
-    'manage_documents',
-    'upload_documents',
     'publish_acts',
+    'delete_documents',
     'manage_consejeros',
     'manage_news',
     'create_news',
+    'delete_news',
     'manage_proposals',
     'respond_proposals',
+    'manage_media',
+    'upload_media',
     'send_official_email',
     'view_audit_logs',
-  ],
-  presidente: [
-    'manage_sessions',
-    'create_sessions',
-    'call_sessions',
-    'approve_documents',
-    'sign_acts',
-    'manage_news',
-    'create_news',
-    'manage_projects',
-    'approve_projects',
-    'manage_polls',
-  ],
-  vicepresidente: [
-    'manage_sessions',
-    'call_sessions',
-    'manage_news',
-    'create_news',
-    'manage_projects',
   ],
   consejero: [
     'view_internal_documents',
@@ -108,6 +111,7 @@ export const SYSTEM_ROLE_PERMISSIONS: Record<string, string[]> = {
     'submit_initiatives',
     'view_private_sessions',
     'sync_calendar',
+    'upload_media',
   ],
   ciudadano: [
     'submit_proposal',
@@ -116,6 +120,15 @@ export const SYSTEM_ROLE_PERMISSIONS: Record<string, string[]> = {
     'send_contact_message',
   ],
 };
+
+// Helper: Check if user has main administrator powers (admin, presidente, vicepresidente)
+export function isMainAdmin(user?: { role?: string; email?: string; isSuperAdmin?: boolean }): boolean {
+  if (!user) return false;
+  const email = (user.email || '').toLowerCase();
+  if (email === ADMIN_EMAIL.toLowerCase()) return true;
+  if (user.isSuperAdmin) return true;
+  return ['admin', 'presidente', 'vicepresidente'].includes(user.role || '');
+}
 
 // Interfaces for DB
 interface DatabaseSchema {
@@ -152,6 +165,105 @@ interface DatabaseSchema {
   socialOversight: any[];
   trainingResources: any[];
   partners: any[];
+  siteSettings: any;
+  media: any[];
+}
+
+function getDefaultSiteSettings() {
+  return {
+    siteName: 'Consejo Municipal de Juventud Flandes',
+    municipality: 'Flandes',
+    department: 'Tolima',
+    period: '2024 - 2026',
+    logoUrl: '/src/assets/images/cmj_flandes_emblem_1793990337067.jpg',
+    shieldUrl: '/src/assets/images/cmj_flandes_emblem_1793990337067.jpg',
+    heroBannerUrl: '/src/assets/images/flandes_river_landscape_1793990334929.jpg',
+    heroTitle: 'Consejo Municipal de Juventud de Flandes',
+    heroSubtitle: 'Voz, liderazgo y transformación social para las juventudes de la Puerta de Oro del Tolima.',
+    heroBadge: 'Órgano Autónomo de Participación Juvenil • Ley 1622 de 2013',
+    address: 'Carrera 8 con Calle 10, Palacio Municipal, Flandes, Tolima, Colombia',
+    contactEmail: ADMIN_EMAIL,
+    contactPhone: '+57 312 456 7890',
+    officeHours: 'Lunes a Viernes: 8:00 AM - 12:00 PM y 2:00 PM - 5:00 PM',
+    socialLinks: {
+      facebook: 'https://facebook.com/CMJFlandesOficial',
+      instagram: 'https://instagram.com/cmj_flandes',
+      twitter: 'https://twitter.com/CMJFlandes',
+      youtube: 'https://youtube.com/@cmjflandes',
+    },
+    customAnnouncements: 'Convocatoria abierta para mesas temáticas de juventud y veeduría ciudadana 2026.',
+    updatedAt: new Date().toISOString(),
+    updatedBy: 'Secretaría General',
+  };
+}
+
+function getDefaultMedia() {
+  return [
+    {
+      id: 'med_escudo_oficial',
+      name: 'Escudo Institucional CMJ Flandes',
+      type: 'image',
+      mimeType: 'image/jpeg',
+      size: 245000,
+      url: '/src/assets/images/cmj_flandes_emblem_1793990337067.jpg',
+      thumbnailUrl: '/src/assets/images/cmj_flandes_emblem_1793990337067.jpg',
+      category: 'institucional',
+      title: 'Emblema y Escudo Oficial',
+      description: 'Emblema institucional del Consejo Municipal de Juventud de Flandes, Tolima.',
+      altText: 'Escudo oficial del Consejo Municipal de Juventud de Flandes',
+      uploadedBy: 'Secretaría General',
+      uploadedAt: '2026-01-01T00:00:00Z',
+      isExternal: false,
+    },
+    {
+      id: 'med_rio_magdalena',
+      name: 'Paisaje Ribereño de Flandes y Río Magdalena',
+      type: 'image',
+      mimeType: 'image/jpeg',
+      size: 320000,
+      url: '/src/assets/images/flandes_river_landscape_1793990334929.jpg',
+      thumbnailUrl: '/src/assets/images/flandes_river_landscape_1793990334929.jpg',
+      category: 'territorio',
+      title: 'Paisaje del Río Magdalena en Flandes',
+      description: 'Vista panorámica ribereña del Río Magdalena en el municipio de Flandes, Tolima.',
+      altText: 'Río Magdalena a su paso por Flandes Tolima',
+      uploadedBy: 'Secretaría General',
+      uploadedAt: '2026-01-01T00:00:00Z',
+      isExternal: false,
+    },
+    {
+      id: 'med_asamblea_juventud',
+      name: 'Asamblea Municipal y Participación Juvenil',
+      type: 'image',
+      mimeType: 'image/jpeg',
+      size: 380000,
+      url: '/src/assets/images/flandes_youth_assembly_1793990336686.jpg',
+      thumbnailUrl: '/src/assets/images/flandes_youth_assembly_1793990336686.jpg',
+      category: 'eventos',
+      title: 'Encuentro y Asamblea Plenaria Juvenil',
+      description: 'Jóvenes consejeros y líderes debatiendo en asamblea de juventudes de Flandes.',
+      altText: 'Jóvenes de Flandes en asamblea municipal participativa',
+      uploadedBy: 'Secretaría General',
+      uploadedAt: '2026-01-01T00:00:00Z',
+      isExternal: false,
+    },
+    {
+      id: 'med_cultura_comunidad',
+      name: 'Cultura, Juventudes y Tradición Flamenca',
+      type: 'image',
+      mimeType: 'image/jpeg',
+      size: 290000,
+      url: '/src/assets/images/flandes_community_culture_1793990337465.jpg',
+      thumbnailUrl: '/src/assets/images/flandes_community_culture_1793990337465.jpg',
+      category: 'eventos',
+      title: 'Actividades Culturales y Deportivas',
+      description: 'Juventudes participando en encuentros culturales y comunitarios en Flandes.',
+      altText: 'Jóvenes participando en eventos culturales de Flandes Tolima',
+      uploadedBy: 'Secretaría General',
+      uploadedAt: '2026-01-01T00:00:00Z',
+      isExternal: false,
+    },
+  ];
 }
 
 // Initial Seed with ONLY official Admin account
@@ -341,6 +453,8 @@ function getInitialSeed(): DatabaseSchema {
         website: 'https://colombiajoven.gov.co',
       },
     ],
+    siteSettings: getDefaultSiteSettings(),
+    media: getDefaultMedia(),
   };
 }
 
@@ -354,16 +468,35 @@ function readDb(): DatabaseSchema {
     }
     const data = fs.readFileSync(DB_FILE, 'utf-8');
     const parsed = JSON.parse(data);
+    let mutated = false;
+
     // Ensure admin user exists with current credentials
     const adminExists = parsed.users.some((u: any) => u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
     if (!adminExists) {
       parsed.users.unshift(getInitialSeed().users[0]);
+      mutated = true;
+    }
+    if (!parsed.siteSettings) {
+      parsed.siteSettings = getDefaultSiteSettings();
+      mutated = true;
+    }
+    if (!parsed.media) {
+      parsed.media = getDefaultMedia();
+      mutated = true;
+    }
+    if (mutated) {
       writeDb(parsed);
     }
     return parsed;
   } catch (err) {
-    console.error('Error reading db.json, returning initial seed:', err);
-    return getInitialSeed();
+    console.error('Error reading db.json, recovering with initial seed:', err);
+    const fallback = getInitialSeed();
+    try {
+      writeDb(fallback);
+    } catch (e) {
+      // ignore write error
+    }
+    return fallback;
   }
 }
 
@@ -450,8 +583,8 @@ function requireRole(allowedRoles: string[]) {
     if (!req.user) {
       return res.status(401).json({ error: 'No autenticado.' });
     }
-    if (req.user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() || req.user.role === 'admin') {
-      return next(); // Full super admin bypass
+    if (isMainAdmin(req.user)) {
+      return next(); // Full admin bypass for admin, presidente, vicepresidente
     }
     if (!allowedRoles.includes(req.user.role)) {
       return res.status(403).json({ error: 'No tienes los permisos requeridos para esta acción institucional.' });
@@ -1166,11 +1299,218 @@ app.get('/api/partners', (req, res) => {
   res.json(db.partners);
 });
 
-// ADMIN: User Management (Strictly restricted to ADMIN_EMAIL / isSuperAdmin)
+// ==========================================
+// SITE SETTINGS & BRANDING (Admin, Presidente, Vicepresidente)
+// ==========================================
+app.get('/api/settings', (req, res) => {
+  const db = readDb();
+  res.json(db.siteSettings || getDefaultSiteSettings());
+});
+
+app.put('/api/settings', authenticateToken, (req: AuthRequest, res: Response) => {
+  if (!isMainAdmin(req.user)) {
+    return res.status(403).json({ error: 'Solo los administradores principales (Admin, Presidente, Vicepresidente) pueden actualizar la configuración y logos del sitio.' });
+  }
+  const db = readDb();
+  db.siteSettings = {
+    ...db.siteSettings,
+    ...req.body,
+    updatedAt: new Date().toISOString(),
+    updatedBy: req.user!.name,
+  };
+  writeDb(db);
+  logAudit(req.user!.email, req.user!.name, 'UPDATE_SETTINGS', 'settings', 'Actualizó configuración institucional y logos del sitio', req.ip);
+  res.json(db.siteSettings);
+});
+
+// ==========================================
+// MEDIA LIBRARY & PHOTO/VIDEO UPLOAD
+// ==========================================
+app.get('/api/media', (req, res) => {
+  const db = readDb();
+  let list = db.media || [];
+  const { type, category, search } = req.query;
+
+  if (type && type !== 'all') {
+    list = list.filter((m: any) => m.type === type);
+  }
+  if (category && category !== 'all') {
+    list = list.filter((m: any) => m.category === category);
+  }
+  if (search && typeof search === 'string') {
+    const q = search.toLowerCase();
+    list = list.filter((m: any) => 
+      (m.title && m.title.toLowerCase().includes(q)) || 
+      (m.name && m.name.toLowerCase().includes(q)) ||
+      (m.description && m.description.toLowerCase().includes(q))
+    );
+  }
+
+  // Sort newest first
+  list = [...list].sort((a: any, b: any) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
+  res.json(list);
+});
+
+app.post('/api/media', authenticateToken, (req: AuthRequest, res: Response) => {
+  const db = readDb();
+  const {
+    name,
+    type,
+    mimeType,
+    size,
+    url,
+    thumbnailUrl,
+    category,
+    title,
+    description,
+    altText,
+    dimensions,
+    duration,
+    isExternal,
+    externalPlatform,
+  } = req.body;
+
+  if (!url || !title) {
+    return res.status(400).json({ error: 'La URL y el título son obligatorios para guardar multimedia.' });
+  }
+
+  const newMedia = {
+    id: `med_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+    name: name || title,
+    type: type || 'image',
+    mimeType: mimeType || (type === 'video' ? 'video/mp4' : 'image/jpeg'),
+    size: size || 0,
+    url,
+    thumbnailUrl: thumbnailUrl || url,
+    category: category || 'general',
+    title,
+    description: description || '',
+    altText: altText || title,
+    dimensions: dimensions || undefined,
+    duration: duration || undefined,
+    isExternal: !!isExternal,
+    externalPlatform: externalPlatform || undefined,
+    uploadedBy: req.user!.name,
+    uploadedAt: new Date().toISOString(),
+  };
+
+  if (!db.media) db.media = [];
+  db.media.unshift(newMedia);
+  writeDb(db);
+  logAudit(req.user!.email, req.user!.name, 'UPLOAD_MEDIA', 'media', `Subió archivo multimedia: ${newMedia.title} (${newMedia.type})`, req.ip);
+
+  res.status(201).json(newMedia);
+});
+
+app.put('/api/media/:id', authenticateToken, (req: AuthRequest, res: Response) => {
+  const db = readDb();
+  const idx = (db.media || []).findIndex((m: any) => m.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Archivo multimedia no encontrado.' });
+
+  db.media[idx] = {
+    ...db.media[idx],
+    ...req.body,
+  };
+  writeDb(db);
+  logAudit(req.user!.email, req.user!.name, 'UPDATE_MEDIA', 'media', `Actualizó metadatos de multimedia: ${db.media[idx].title}`, req.ip);
+
+  res.json(db.media[idx]);
+});
+
+app.delete('/api/media/:id', authenticateToken, (req: AuthRequest, res: Response) => {
+  if (!isMainAdmin(req.user) && req.user?.role !== 'secretario') {
+    return res.status(403).json({ error: 'Permisos insuficientes para eliminar archivos multimedia.' });
+  }
+
+  const db = readDb();
+  const target = (db.media || []).find((m: any) => m.id === req.params.id);
+  if (!target) return res.status(404).json({ error: 'Archivo multimedia no encontrado.' });
+
+  // Detect usage
+  const isInLogo = db.siteSettings?.logoUrl === target.url || db.siteSettings?.shieldUrl === target.url;
+  const isInBanner = db.siteSettings?.heroBannerUrl === target.url;
+  const wasInUse = isInLogo || isInBanner;
+
+  db.media = (db.media || []).filter((m: any) => m.id !== req.params.id);
+  writeDb(db);
+  logAudit(req.user!.email, req.user!.name, 'DELETE_MEDIA', 'media', `Eliminó archivo multimedia: ${target.title}`, req.ip);
+
+  res.json({ message: 'Archivo multimedia eliminado con éxito.', wasInUse });
+});
+
+app.post('/api/media/batch-delete', authenticateToken, (req: AuthRequest, res: Response) => {
+  if (!isMainAdmin(req.user) && req.user?.role !== 'secretario') {
+    return res.status(403).json({ error: 'Permisos insuficientes para eliminar archivos multimedia.' });
+  }
+
+  const { ids } = req.body;
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ error: 'Lista de IDs no válida.' });
+  }
+
+  const db = readDb();
+  const beforeCount = (db.media || []).length;
+  db.media = (db.media || []).filter((m: any) => !ids.includes(m.id));
+  const deletedCount = beforeCount - db.media.length;
+  writeDb(db);
+
+  logAudit(req.user!.email, req.user!.name, 'BATCH_DELETE_MEDIA', 'media', `Eliminó ${deletedCount} archivos multimedia`, req.ip);
+  res.json({ message: `Se eliminaron ${deletedCount} archivos multimedia con éxito.`, deletedCount });
+});
+
+// Additional DELETE endpoints for full admin capability
+app.delete('/api/projects/:id', authenticateToken, requireRole(['admin', 'presidente', 'vicepresidente', 'secretario']), (req: AuthRequest, res: Response) => {
+  const db = readDb();
+  const target = db.projects.find(p => p.id === req.params.id);
+  db.projects = db.projects.filter(p => p.id !== req.params.id);
+  writeDb(db);
+  logAudit(req.user!.email, req.user!.name, 'DELETE_PROJECT', 'projects', `Eliminó proyecto: ${target?.title || req.params.id}`, req.ip);
+  res.json({ message: 'Proyecto eliminado exitosamente.' });
+});
+
+app.delete('/api/activities/:id', authenticateToken, requireRole(['admin', 'presidente', 'vicepresidente', 'secretario']), (req: AuthRequest, res: Response) => {
+  const db = readDb();
+  db.activities = db.activities.filter(a => a.id !== req.params.id);
+  writeDb(db);
+  res.json({ message: 'Actividad eliminada exitosamente.' });
+});
+
+app.delete('/api/polls/:id', authenticateToken, requireRole(['admin', 'presidente', 'vicepresidente', 'secretario']), (req: AuthRequest, res: Response) => {
+  const db = readDb();
+  const target = db.polls.find(p => p.id === req.params.id);
+  db.polls = db.polls.filter(p => p.id !== req.params.id);
+  writeDb(db);
+  logAudit(req.user!.email, req.user!.name, 'DELETE_POLL', 'polls', `Eliminó encuesta: ${target?.title || req.params.id}`, req.ip);
+  res.json({ message: 'Encuesta eliminada exitosamente.' });
+});
+
+app.delete('/api/citizen-proposals/:id', authenticateToken, requireRole(['admin', 'presidente', 'vicepresidente', 'secretario']), (req: AuthRequest, res: Response) => {
+  const db = readDb();
+  const target = db.citizenProposals.find(p => p.id === req.params.id);
+  db.citizenProposals = db.citizenProposals.filter(p => p.id !== req.params.id);
+  writeDb(db);
+  logAudit(req.user!.email, req.user!.name, 'DELETE_PROPOSAL', 'citizenProposals', `Eliminó propuesta ciudadana: ${target?.radicadoCode || req.params.id}`, req.ip);
+  res.json({ message: 'Propuesta ciudadana eliminada exitosamente.' });
+});
+
+app.delete('/api/private/commitments/:id', authenticateToken, (req: AuthRequest, res: Response) => {
+  const db = readDb();
+  db.commitments = db.commitments.filter(c => c.id !== req.params.id);
+  writeDb(db);
+  res.json({ message: 'Compromiso eliminado exitosamente.' });
+});
+
+app.delete('/api/private/social-oversight/:id', authenticateToken, (req: AuthRequest, res: Response) => {
+  const db = readDb();
+  db.socialOversight = db.socialOversight.filter(s => s.id !== req.params.id);
+  writeDb(db);
+  res.json({ message: 'Registro de veeduría eliminado exitosamente.' });
+});
+
+// ADMIN: User Management (Accessible to Main Admins: Admin, Presidente, Vicepresidente)
 app.get('/api/admin/users', authenticateToken, (req: AuthRequest, res: Response) => {
-  const isSuper = req.user?.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() || req.user?.isSuperAdmin;
-  if (!isSuper) {
-    return res.status(403).json({ error: 'Solo la cuenta del Administrador Principal tiene acceso a la gestión de usuarios.' });
+  if (!isMainAdmin(req.user)) {
+    return res.status(403).json({ error: 'Acceso restringido a la Mesa Directiva y Administradores Principales.' });
   }
 
   const db = readDb();
@@ -1179,15 +1519,13 @@ app.get('/api/admin/users', authenticateToken, (req: AuthRequest, res: Response)
 });
 
 app.post('/api/admin/users', authenticateToken, (req: AuthRequest, res: Response) => {
-  // USER MANDATE: "yo soy el unico de crear cuentas"
-  const isSuper = req.user?.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() || req.user?.isSuperAdmin;
-  if (!isSuper) {
+  if (!isMainAdmin(req.user)) {
     return res.status(403).json({
-      error: 'Acceso denegado: Únicamente la Secretaría General (trujillogordilooo@gmail.com) está facultada para crear cuentas directamente.',
+      error: 'Acceso denegado: Únicamente los Administradores Principales (Administrador, Presidente, Vicepresidente) pueden crear cuentas directamente.',
     });
   }
 
-  const { name, email, password, role, sector, phone } = req.body;
+  const { name, email, password, role, sector, politicalParty, phone } = req.body;
   if (!name || !email || !password) {
     return res.status(400).json({ error: 'Nombre, correo y contraseña son obligatorios.' });
   }
@@ -1205,7 +1543,8 @@ app.post('/api/admin/users', authenticateToken, (req: AuthRequest, res: Response
     passwordHash: bcrypt.hashSync(password, 10),
     role: role || 'consejero',
     status: 'active' as const,
-    sector: sector || 'Mesa Directiva',
+    sector: sector || 'Listas Independientes',
+    politicalParty: politicalParty || '',
     phone: phone || '',
     createdAt: new Date().toISOString(),
   };
@@ -1219,9 +1558,8 @@ app.post('/api/admin/users', authenticateToken, (req: AuthRequest, res: Response
 });
 
 app.put('/api/admin/users/:id', authenticateToken, (req: AuthRequest, res: Response) => {
-  const isSuper = req.user?.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() || req.user?.isSuperAdmin;
-  if (!isSuper) {
-    return res.status(403).json({ error: 'Solo la Secretaría General puede modificar cuentas de usuario.' });
+  if (!isMainAdmin(req.user)) {
+    return res.status(403).json({ error: 'Solo los administradores principales pueden modificar cuentas de usuario.' });
   }
 
   const db = readDb();
@@ -1244,9 +1582,8 @@ app.put('/api/admin/users/:id', authenticateToken, (req: AuthRequest, res: Respo
 });
 
 app.delete('/api/admin/users/:id', authenticateToken, (req: AuthRequest, res: Response) => {
-  const isSuper = req.user?.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() || req.user?.isSuperAdmin;
-  if (!isSuper) {
-    return res.status(403).json({ error: 'Solo la Secretaría General puede eliminar cuentas de usuario.' });
+  if (!isMainAdmin(req.user)) {
+    return res.status(403).json({ error: 'Solo los administradores principales pueden eliminar cuentas de usuario.' });
   }
 
   const db = readDb();
@@ -1255,6 +1592,12 @@ app.delete('/api/admin/users/:id', authenticateToken, (req: AuthRequest, res: Re
 
   if (target.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() || target.isSuperAdmin) {
     return res.status(403).json({ error: 'La cuenta del Administrador Principal está protegida institucionalmente contra eliminación.' });
+  }
+
+  // Protect last admin
+  const adminCount = db.users.filter(u => ['admin', 'presidente', 'vicepresidente'].includes(u.role) && u.status === 'active').length;
+  if (['admin', 'presidente', 'vicepresidente'].includes(target.role) && adminCount <= 1) {
+    return res.status(403).json({ error: 'No es posible eliminar al único administrador activo del sistema institucional.' });
   }
 
   db.users = db.users.filter(u => u.id !== req.params.id);
@@ -1266,15 +1609,13 @@ app.delete('/api/admin/users/:id', authenticateToken, (req: AuthRequest, res: Re
 
 // ADMIN: Audit Logs
 app.get('/api/admin/audit-logs', authenticateToken, (req: AuthRequest, res: Response) => {
-  const isSuper = req.user?.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() || req.user?.isSuperAdmin;
-  if (!isSuper) return res.status(403).json({ error: 'Acceso denegado a registros de auditoría.' });
+  if (!isMainAdmin(req.user) && req.user?.role !== 'secretario') return res.status(403).json({ error: 'Acceso denegado a registros de auditoría.' });
   res.json(getAuditLogs());
 });
 
 // ADMIN: Backup & Restore
 app.get('/api/admin/backup', authenticateToken, (req: AuthRequest, res: Response) => {
-  const isSuper = req.user?.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() || req.user?.isSuperAdmin;
-  if (!isSuper) return res.status(403).json({ error: 'Acceso denegado a copias de seguridad.' });
+  if (!isMainAdmin(req.user)) return res.status(403).json({ error: 'Acceso denegado a copias de seguridad.' });
 
   const db = readDb();
   logAudit(req.user!.email, req.user!.name, 'EXPORT_BACKUP', 'system', 'Generó copia de seguridad del sistema', req.ip);

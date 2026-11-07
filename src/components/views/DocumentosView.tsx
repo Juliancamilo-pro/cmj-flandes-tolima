@@ -16,15 +16,29 @@ import {
   ShieldCheck,
   Calendar,
   Layers,
-  FileCheck
+  FileCheck,
+  Trash2
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 export const DocumentosView: React.FC = () => {
+  const { user } = useAuth();
+  const isMainAdmin = user?.role === 'admin' || user?.role === 'presidente' || user?.role === 'vicepresidente' || user?.email?.toLowerCase() === 'trujillogordilooo@gmail.com';
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todas');
   const [previewDoc, setPreviewDoc] = useState<DocumentItem | null>(null);
+
+  const handleDeleteDocument = async (id: string) => {
+    if (!confirm('¿Confirma que desea eliminar este documento / acta oficial del archivo?')) return;
+    try {
+      await api.deleteDocument(id);
+      loadDocuments();
+    } catch (err: any) {
+      alert(err.message || 'Error al eliminar documento');
+    }
+  };
 
   useEffect(() => {
     loadDocuments();
@@ -168,13 +182,24 @@ export const DocumentosView: React.FC = () => {
                   <span>Estado: {doc.status}</span>
                 </span>
 
-                <button
-                  onClick={() => setPreviewDoc(doc)}
-                  className="px-3.5 py-1.5 text-xs font-semibold text-red-900 dark:text-red-300 hover:text-white hover:bg-red-900 dark:hover:bg-red-800 rounded-lg transition-colors border border-red-900/30 flex items-center gap-1.5"
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>Abrir Documento</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPreviewDoc(doc)}
+                    className="px-3.5 py-1.5 text-xs font-semibold text-red-900 dark:text-red-300 hover:text-white hover:bg-red-900 dark:hover:bg-red-800 rounded-lg transition-colors border border-red-900/30 flex items-center gap-1.5"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Abrir Documento</span>
+                  </button>
+                  {isMainAdmin && (
+                    <button
+                      onClick={() => handleDeleteDocument(doc.id)}
+                      className="p-1.5 text-stone-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg transition-colors border border-stone-200 dark:border-stone-800"
+                      title="Eliminar documento del archivo público"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}

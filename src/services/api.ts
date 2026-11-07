@@ -20,6 +20,8 @@ import {
   TrainingResource,
   InstitutionalPartner,
   AuditLogEntry,
+  MediaItem,
+  SiteSettings,
 } from '../types';
 
 const API_BASE = '/api';
@@ -475,6 +477,124 @@ export const api = {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify({ database }),
+    });
+    return handleResponse(res);
+  },
+
+  // Site Settings
+  async getSiteSettings(): Promise<SiteSettings> {
+    const res = await fetch(`${API_BASE}/settings`);
+    return handleResponse(res);
+  },
+
+  async updateSiteSettings(data: Partial<SiteSettings>): Promise<SiteSettings> {
+    const res = await fetch(`${API_BASE}/settings`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    return handleResponse(res);
+  },
+
+  // Media Library
+  async getMedia(filters?: { type?: string; category?: string; search?: string }): Promise<MediaItem[]> {
+    const params = new URLSearchParams();
+    if (filters?.type && filters.type !== 'all') params.append('type', filters.type);
+    if (filters?.category && filters.category !== 'all') params.append('category', filters.category);
+    if (filters?.search) params.append('search', filters.search);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    const res = await fetch(`${API_BASE}/media${queryString}`);
+    return handleResponse(res);
+  },
+
+  async uploadMedia(data: Partial<MediaItem>): Promise<MediaItem> {
+    const res = await fetch(`${API_BASE}/media`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    return handleResponse(res);
+  },
+
+  async updateMedia(id: string, data: Partial<MediaItem>): Promise<MediaItem> {
+    const res = await fetch(`${API_BASE}/media/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+    return handleResponse(res);
+  },
+
+  async deleteMedia(id: string): Promise<{ message: string; wasInUse?: boolean }> {
+    const res = await fetch(`${API_BASE}/media/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  async batchDeleteMedia(ids: string[]): Promise<{ message: string; deletedCount: number }> {
+    const res = await fetch(`${API_BASE}/media/batch-delete`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ ids }),
+    });
+    return handleResponse(res);
+  },
+
+  // Content Deletion Helpers
+  async deleteSession(id: string): Promise<{ message: string }> {
+    const res = await fetch(`${API_BASE}/sessions/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  async deleteProject(id: string): Promise<{ message: string }> {
+    const res = await fetch(`${API_BASE}/projects/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  async deleteActivity(id: string): Promise<{ message: string }> {
+    const res = await fetch(`${API_BASE}/activities/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  async deletePoll(id: string): Promise<{ message: string }> {
+    const res = await fetch(`${API_BASE}/polls/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  async deleteCitizenProposal(id: string): Promise<{ message: string }> {
+    const res = await fetch(`${API_BASE}/citizen-proposals/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  async deleteCommitment(id: string): Promise<{ message: string }> {
+    const res = await fetch(`${API_BASE}/private/commitments/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    return handleResponse(res);
+  },
+
+  async deleteSocialOversight(id: string): Promise<{ message: string }> {
+    const res = await fetch(`${API_BASE}/private/social-oversight/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
     });
     return handleResponse(res);
   },
