@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from 'react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { SiteSettingsProvider } from './context/SiteSettingsContext';
@@ -152,6 +153,7 @@ export default function App() {
       <AuthProvider>
         <SiteSettingsProvider>
           <AppContent />
+          <SpeedInsights />
         </SiteSettingsProvider>
       </AuthProvider>
     </ThemeProvider>

@@ -11,6 +11,7 @@
         "@types/cors": "^2.8.19",
         "@types/jsonwebtoken": "^9.0.10",
         "@types/pg": "^8.23.1",
+        "@vercel/speed-insights": "^2.1.0",
         "@vis.gl/react-google-maps": "^1.10.2",
         "@vitejs/plugin-react": "^6.1.1",
         "bcryptjs": "^3.0.3",
@@ -430,6 +431,8 @@
     "@typescript/typescript-win32-arm64": ["@typescript/typescript-win32-arm64@7.0.2", "", { "os": "win32", "cpu": "arm64" }, "sha512-Gyl1Vy6OsWesLzmq+EP0Fb7b4Nid5232AvcA2SFcdYreldpNtYFFofPjnt62y9hQy7VTaZp65ICJjuAQRaVcIQ=="],
 
     "@typescript/typescript-win32-x64": ["@typescript/typescript-win32-x64@7.0.2", "", { "os": "win32", "cpu": "x64" }, "sha512-0BQ3HkAHHlKLSp1qRvf3SUhGpGsDuhB/jgFw75guyqbxJqEaS0Cw/VFO8i2nHglJUzQCRtMMR/IBAKE3ETMC4g=="],
+
+    "@vercel/speed-insights": ["@vercel/speed-insights@2.1.0", "", { "peerDependencies": { "@sveltejs/kit": "^1 || ^2 || ^3 || ^3.0.0-next.0", "next": ">= 13", "nuxt": ">= 3", "react": "^18 || ^19 || ^19.0.0-rc", "svelte": ">= 4", "vue": "^3", "vue-router": "^4" }, "optionalPeers": ["@sveltejs/kit", "next", "nuxt", "react", "svelte", "vue", "vue-router"] }, "sha512-tkDiIEjjmlwPpTFnOK14hBhsRLMo5yoCeK2Er3AHWlL7WTzHgFSyItps3TOW0HukErUlYlaUeHiVLCyfiE4WAA=="],
 
     "@vis.gl/react-google-maps": ["@vis.gl/react-google-maps@1.10.2", "", { "dependencies": { "@googlemaps/js-api-loader": "^2.1.1", "@types/google.maps": "^3.65.5", "fast-equals": "^6.0.2" }, "peerDependencies": { "react": ">=16.8.0 || ^19.0 || ^19.0.0-rc", "react-dom": ">=16.8.0 || ^19.0 || ^19.0.0-rc" } }, "sha512-2cVOoaum3UDBDWhQwDGg8YxhFBIZ/B9YmRJxuHPZcCPMEf9VfqEw3ZRgD5GUXC9OA/0cbYx250obvZGPmBOIkw=="],
 
